@@ -3,6 +3,7 @@ from datetime import datetime as dt
 import dateutil.parser
 import discord
 from emoji import emojize
+import json
 import locale
 import re
 from sys import argv
@@ -21,13 +22,27 @@ except FileNotFoundError:
 
 activity = discord.Activity(type=discord.ActivityType.listening, name="/datepoll help")
 client = discord.Client(activity=activity)
-formats = dict()
-locales = dict()
+try:
+    with open("config.json") as file:
+        d = json.load(file)
+        formats = d.get("formats")
+        locales = d.get("locals")
+        formats = formats if isinstance(formats, dict) else dict()
+        locales = locales if isinstance(locales, dict) else dict()
+except:
+    formats = dict()
+    locales = dict()
 
+def save_config():
+    with open("config.json", "w") as file:
+        json.dump({"formats":formats, "locales":locales}, file, indent=4)
 
 def to_date(date_str):
    return dateutil.parser.parse(date_str)
 
+
+def get_id(message):
+    return str(message.guild.id)
 
 def input_to_date_list(input_str):
     dates = []
@@ -75,7 +90,7 @@ def formatted_dates_to_out(formatted_dates):
 def process(message):
     input_str = message.content
     dates = input_to_date_list(input_str)
-    formatted_dates = [format_datetime(date, format=formats[message.guild.id], locale=locales[message.guild.id]) for date in dates]
+    formatted_dates = [format_datetime(date, format=formats[get_id(message)], locale=locales[get_id(message)]) for date in dates]
     return formatted_dates_to_out(formatted_dates)
 
 
@@ -104,22 +119,24 @@ async def on_message(message):
         format_command = "/datepoll format"
         if message.content.startswith(format_command):
             format_str = message.content[len(format_command)+1:]
-            formats[message.guild.id] = format_str
+            formats[get_id(message)] = format_str
+            save_config()
             return
 
         locale_command = "/datepoll locale"
         if message.content.startswith(locale_command):
             locale_str = message.content[len(locale_command)+1:]
-            locales[message.guild.id] = locale_str
+            locales[get_id(message)] = locale_str
+            save_config()
             return
 
-        if not message.guild.id in formats.keys():
+        if not get_id(message) in formats.keys():
             format_str = "cccc, yyyy-MM-dd"
-            formats[message.guild.id] = format_str
+            formats[get_id(message)] = format_str
 
-        if not message.guild.id in locales.keys():
+        if not get_id(message) in locales.keys():
             locale_str = message.guild.preferred_locale
-            locales[message.guild.id] = locale_str.replace("-","_")
+            locales[get_id(message)] = locale_str.replace("-","_")
 
         msg, num = process(message)
         response = await message.channel.send(msg)
