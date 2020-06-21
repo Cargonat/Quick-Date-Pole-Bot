@@ -12,7 +12,12 @@ from sys import argv
 # end: /datepoll or end of input_str
 # input_str: list of iso 8601 formats separated by whitespace or commas
 
-TOKEN = "NzI0Mjk0NzE4NzM3MDg4NjQz.Xu-IgQ.m8sO7MZ9yjbYdhr9uv3LGSdQVp8"
+try:
+    with open("token.txt") as file:
+        TOKEN = file.read()
+except FileNotFoundError:
+    print("FileNotFoundError: Store your bot's access token in token.txt")
+
 activity = discord.Activity(type=discord.ActivityType.listening, name="/datepoll help")
 client = discord.Client(activity=activity)
 
