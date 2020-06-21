@@ -1,7 +1,8 @@
+from babel.dates import format_datetime
 from datetime import datetime as dt
-from emoji import emojize
 import dateutil.parser
 import discord
+from emoji import emojize
 import locale
 import re
 from sys import argv
@@ -20,6 +21,9 @@ except FileNotFoundError:
 
 activity = discord.Activity(type=discord.ActivityType.listening, name="/datepoll help")
 client = discord.Client(activity=activity)
+formats = dict()
+locales = dict()
+
 
 def to_date(date_str):
    return dateutil.parser.parse(date_str)
@@ -80,10 +84,10 @@ def formatted_dates_to_out(formatted_dates):
     return "\n".join(lines), num
 
 
-def process(input_str):
+def process(message):
+    input_str = message.content
     dates = input_to_date_list(input_str)
-    locale.setlocale(locale.LC_ALL, "")
-    formatted_dates = [date.strftime("%A, %x") for date in dates]
+    formatted_dates = [format_datetime(date, format=formats[message.guild.id], locale=locales[message.guild.id]) for date in dates]
     return formatted_dates_to_out(formatted_dates)
 
 
@@ -91,6 +95,14 @@ def process(input_str):
 
 @client.event
 async def on_message(message):
+    if not message.guild.id in formats.keys():
+        format_str = "cccc, yyyy-mm-dd"
+        formats[message.guild.id] = format_str
+
+    if not message.guild.id in locales.keys():
+        locale_str = message.guild.preferred_locale
+        locales[message.guild.id] = locale_str.replace("-","_")
+
     if message.author == client.user:
         return
 
@@ -98,11 +110,26 @@ async def on_message(message):
         await message.add_reaction(emojize(":partying_face:"))
         msg = '''You can use me to set up quick date polls.
 
-I listen to messages containing "/datepoll" followed by a list of ISO 8601 dates separated by whitespace or commas. The list must be at least 1 and at most 37 dates long. The ISO 8601 format includes the YYYY-MM-DD format and many simplifications of it like MM-DD.'''
+I listen to messages containing "/datepoll" followed by a list of ISO 8601 dates separated by whitespace or commas. The list must be at least 1 and at most 37 dates long. The ISO 8601 format includes the YYYY-MM-DD format and many simplifications of it like MM-DD.
+
+You can set the format of the returned dates by using "/datepoll format FORMAT" where FORMAT is a format using the Unicode Date Format Patterns, which can be found here:
+https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns
+
+    You can set the locale of the returned dates by using "/datepoll locale LOCALE where LOCALE is a locale such as en_US or de_DE using the ISO language and country codes.'''
         await message.channel.send(msg)
         return
 
-    msg, num = process(message.content)
+    format_command = "/datepoll format"
+    if message.content.startswith(format_command):
+        format_str = message.content[len(format_command)+1:]
+        formats[message.guild.id] = format_str
+
+    locale_command = "/datepoll locale"
+    if message.content.startswith(locale_command):
+        locale_str = message.content[len(locale_command)+1:]
+        locales[message.guild.id] = locale_str
+
+    msg, num = process(message)
     response = await message.channel.send(msg)
 
     if num != -1:
