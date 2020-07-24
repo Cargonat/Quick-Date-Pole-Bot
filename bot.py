@@ -8,8 +8,6 @@ import locale
 import re
 from sys import argv
 
-
-
 # start: /datepoll
 # end: /datepoll or end of input_str
 # input_str: list of iso 8601 formats separated by whitespace or commas
@@ -33,22 +31,25 @@ except:
     formats = dict()
     locales = dict()
 
+
 def save_config():
     with open("config.json", "w") as file:
-        json.dump({"formats":formats, "locales":locales}, file, indent=4)
+        json.dump({"formats": formats, "locales": locales}, file, indent=4)
+
 
 def to_date(date_str):
-   return dateutil.parser.parse(date_str)
+    return dateutil.parser.parse(date_str)
 
 
 def get_id(message):
     return str(message.guild.id)
 
+
 def input_to_date_list(input_str):
     dates = []
     command = "/datepoll"
     separators = "\s|,"
-    
+
     start_command_pos = input_str.find(command)
     if start_command_pos != -1:
         list_start = start_command_pos + len(command)
@@ -56,7 +57,7 @@ def input_to_date_list(input_str):
         end_command_pos = input_str.find(command)
         if end_command_pos != -1:
             input_str = input_str[:end_command_pos]
-    
+
         date_str_list = re.split(separators, input_str)
         date_str_list = [s for s in date_str_list if s != ""]
 
@@ -68,9 +69,11 @@ def input_to_date_list(input_str):
 
 def get_indicators(num):
     out = []
-    alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+    alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
+                "v", "w", "x", "y", "z"]
     letters = ["regional_indicator_" + letter for letter in alphabet]
     return [emojize(":" + emoji_str + ":", use_aliases=True) for emoji_str in letters]
+
 
 def formatted_dates_to_out(formatted_dates):
     num = len(formatted_dates)
@@ -90,10 +93,9 @@ def formatted_dates_to_out(formatted_dates):
 def process(message):
     input_str = message.content
     dates = input_to_date_list(input_str)
-    formatted_dates = [format_datetime(date, format=formats[get_id(message)], locale=locales[get_id(message)]) for date in dates]
+    formatted_dates = [format_datetime(date, format=formats[get_id(message)], locale=locales[get_id(message)]) for date
+                       in dates]
     return formatted_dates_to_out(formatted_dates)
-
-
 
 
 @client.event
@@ -118,14 +120,14 @@ async def on_message(message):
 
         format_command = "/datepoll format"
         if message.content.startswith(format_command):
-            format_str = message.content[len(format_command)+1:]
+            format_str = message.content[len(format_command) + 1:]
             formats[get_id(message)] = format_str
             save_config()
             return
 
         locale_command = "/datepoll locale"
         if message.content.startswith(locale_command):
-            locale_str = message.content[len(locale_command)+1:]
+            locale_str = message.content[len(locale_command) + 1:]
             locales[get_id(message)] = locale_str
             save_config()
             return
@@ -136,7 +138,7 @@ async def on_message(message):
 
         if not get_id(message) in locales.keys():
             locale_str = message.guild.preferred_locale
-            locales[get_id(message)] = locale_str.replace("-","_")
+            locales[get_id(message)] = locale_str.replace("-", "_")
 
         msg, num = process(message)
         response = await message.channel.send(msg)
