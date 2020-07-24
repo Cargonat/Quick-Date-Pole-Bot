@@ -17,6 +17,7 @@ try:
         TOKEN = file.read()
 except FileNotFoundError:
     print("FileNotFoundError: Store your bot's access token in token.txt")
+    quit()
 
 activity = discord.Activity(type=discord.ActivityType.listening, name="/datepoll help")
 client = discord.Client(activity=activity)
