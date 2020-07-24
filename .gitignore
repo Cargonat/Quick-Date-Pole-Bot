@@ -1,2 +1,9 @@
 token.txt
 config.json
+.idea/.gitignore
+.idea/Quick-Date-Poll-Bot.iml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+venv/
