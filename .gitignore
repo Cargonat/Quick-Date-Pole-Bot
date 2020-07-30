@@ -7,3 +7,5 @@ config.json
 .idea/modules.xml
 .idea/vcs.xml
 venv/
+.idea/workspace.xml
+Quick-Date-Poll-Bot.iml
