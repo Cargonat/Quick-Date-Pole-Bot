@@ -1,12 +1,9 @@
 from babel.dates import format_datetime
-from datetime import datetime as dt
 import dateutil.parser
 import discord
 from emoji import emojize
 import json
-import locale
 import re
-from sys import argv
 
 # start: /datepoll
 # end: /datepoll or end of input_str
