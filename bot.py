@@ -1,5 +1,6 @@
 from babel.dates import format_datetime
 import dateutil.parser
+import dateutil.relativedelta
 import discord
 from emoji import emojize
 import json
@@ -60,7 +61,15 @@ def input_to_date_list(input_str):
         date_str_list = [s for s in date_str_list if s != ""]
 
         for date in date_str_list:
-            dates.append(dateutil.parser.parse(date))
+            if ">" in date:
+                date_splitter = date.split(">")
+                start_date = dateutil.parser.parse(date_splitter[0])
+                end_date = dateutil.parser.parse(date_splitter[1])
+                while start_date <= end_date:
+                    dates.append(start_date)
+                    start_date = start_date + dateutil.relativedelta.relativedelta(days=1)
+            else:
+                dates.append(dateutil.parser.parse(date))
 
     return dates
 
