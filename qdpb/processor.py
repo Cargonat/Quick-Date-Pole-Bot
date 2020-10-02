@@ -39,7 +39,7 @@ class Processor(object):
                            for date in dates]
         return formatted_dates_to_out(formatted_dates)
 
-    def process_message(self, message):
+    async def process_message(self, message):
         if message.content == "/datepoll help":
             await message.add_reaction(emojize(":partying_face:"))
             msg = '''You can use me to set up quick date polls.
