@@ -16,8 +16,11 @@ except FileNotFoundError:
     print("FileNotFoundError: Store your bot's access token in token.txt")
     quit()
 
+intents = discord.Intents.default()
+intents.message_content = True
+intents.reactions = True
 activity = discord.Activity(type=discord.ActivityType.listening, name="/datepoll help")
-client = discord.Client(activity=activity)
+client = discord.Client(activity=activity, intents=intents)
 try:
     with open("config.json") as file:
         d = json.load(file)
