@@ -1,5 +1,6 @@
 .idea/
 venv/
+.venv/
 Quick-Date-Poll-Bot.iml
 config.json
 token.txt
