@@ -16,11 +16,14 @@ except FileNotFoundError:
     print("FileNotFoundError: Store your bot's access token in token.txt")
     quit()
 
-intents = discord.Intents.default()
-intents.message_content = True
-intents.reactions = True
+# intents = discord.Intents.default()
+# intents.message_content = True
+# intents.reactions = True
 activity = discord.Activity(type=discord.ActivityType.listening, name="/datepoll help")
-client = discord.Client(activity=activity, intents=intents)
+client = discord.Client(
+    activity=activity, 
+#   intents=intents,
+)
 try:
     with open("config.json") as file:
         d = json.load(file)
@@ -69,11 +72,7 @@ def input_to_date_list(input_str):
 
 
 def get_indicators(num):
-    out = []
-    alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
-                "v", "w", "x", "y", "z"]
-    letters = ["regional_indicator_" + letter for letter in alphabet]
-    return [emojize(":" + emoji_str + ":", use_aliases=True) for emoji_str in letters]
+    return ["🇦","🇧","🇨","🇩","🇪","🇫","🇬","🇭","🇮","🇯","🇰","🇱","🇲","🇳","🇴","🇵","🇶","🇷","🇸","🇹","🇺","🇻","🇼","🇽","🇾","🇿"]
 
 
 def formatted_dates_to_out(formatted_dates):
@@ -138,7 +137,7 @@ async def on_message(message):
             formats[get_id(message)] = format_str
 
         if not get_id(message) in locales.keys():
-            locale_str = message.guild.preferred_locale
+            locale_str = str(message.guild.preferred_locale)
             locales[get_id(message)] = locale_str.replace("-", "_")
 
         msg, num = process(message)
@@ -148,7 +147,7 @@ async def on_message(message):
             indicators = get_indicators(num)
             for emoji in indicators[:num]:
                 await response.add_reaction(emoji)
-            await response.add_reaction(emojize(":no_entry_sign:", use_aliases=True))
+            await response.add_reaction(emojize(":no_entry_sign:", language="alias"))
 
 
 @client.event
