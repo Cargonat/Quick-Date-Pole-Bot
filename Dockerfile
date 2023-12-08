@@ -6,7 +6,6 @@ WORKDIR /usr/app/qdpb
 # add the required files
 ADD bot.py .
 ADD requirements.txt .
-ADD token.txt .
 
 # install dependencies
 RUN pip install -r requirements.txt

@@ -4,16 +4,15 @@ import discord
 from emoji import emojize
 import json
 import re
+import os
 
 # start: /datepoll
 # end: /datepoll or end of input_str
 # input_str: list of iso 8601 formats separated by whitespace or commas
 
-try:
-    with open("token.txt") as file:
-        TOKEN = file.read()
-except FileNotFoundError:
-    print("FileNotFoundError: Store your bot's access token in token.txt")
+TOKEN = os.environ.get("QDPB_TOKEN")
+if TOKEN is None:
+    print("ERROR: Token not found. Export your bot's access token in the QDPB_TOKEN environment variable.")
     quit()
 
 # intents = discord.Intents.default()

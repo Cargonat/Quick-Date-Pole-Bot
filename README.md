@@ -5,7 +5,7 @@
 Follow the tutorial of discordpy to create a discord application with a bot
 account: [Creating a Bot Account}(https://discordpy.readthedocs.io/en/stable/discord.html#creating-a-bot-account)
 
-Then put the token in a file named `token.txt` next to `bot.py`.
+Export the discord token in the `QDPB_TOKEN` environment variable.
 
 ## How to run the bot locally
 
@@ -17,6 +17,6 @@ Then put the token in a file named `token.txt` next to `bot.py`.
 ## How to run the bot via Docker
 
 1. Install Docker
-2. Run `docker image build -t qdpb:1.0.0 .` (including the dot `.`)
-3. Run the docker image via `docker run qdpb:1.0.0`. You might want to add
+2. Run `docker image build -t qdpb .` (including the dot `.`)
+3. Run the docker image via `docker run qdpb`. You might want to add
    `--restart always` for the container to automatically restart.
