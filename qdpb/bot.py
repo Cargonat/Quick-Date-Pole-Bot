@@ -10,18 +10,13 @@ import os
 # end: /datepoll or end of input_str
 # input_str: list of iso 8601 formats separated by whitespace or commas
 
-TOKEN = os.environ.get("QDPB_TOKEN")
-if TOKEN is None:
-    print("ERROR: Token not found. Export your bot's access token in the QDPB_TOKEN environment variable.")
-    quit()
-
-# intents = discord.Intents.default()
-# intents.message_content = True
-# intents.reactions = True
+intents = discord.Intents.default()
+intents.message_content = True
+intents.reactions = True
 activity = discord.Activity(type=discord.ActivityType.listening, name="/datepoll help")
 client = discord.Client(
-    activity=activity, 
-#   intents=intents,
+    activity=activity,
+    intents=intents,
 )
 try:
     with open("config.json") as file:
@@ -30,7 +25,7 @@ try:
         locales = d.get("locals")
         formats = formats if isinstance(formats, dict) else dict()
         locales = locales if isinstance(locales, dict) else dict()
-except:
+except Exception:
     formats = dict()
     locales = dict()
 
@@ -71,7 +66,34 @@ def input_to_date_list(input_str):
 
 
 def get_indicators(num):
-    return ["🇦","🇧","🇨","🇩","🇪","🇫","🇬","🇭","🇮","🇯","🇰","🇱","🇲","🇳","🇴","🇵","🇶","🇷","🇸","🇹","🇺","🇻","🇼","🇽","🇾","🇿"]
+    return [
+        "🇦",
+        "🇧",
+        "🇨",
+        "🇩",
+        "🇪",
+        "🇫",
+        "🇬",
+        "🇭",
+        "🇮",
+        "🇯",
+        "🇰",
+        "🇱",
+        "🇲",
+        "🇳",
+        "🇴",
+        "🇵",
+        "🇶",
+        "🇷",
+        "🇸",
+        "🇹",
+        "🇺",
+        "🇻",
+        "🇼",
+        "🇽",
+        "🇾",
+        "🇿",
+    ]
 
 
 def formatted_dates_to_out(formatted_dates):
@@ -92,50 +114,53 @@ def formatted_dates_to_out(formatted_dates):
 def process(message):
     input_str = message.content
     dates = input_to_date_list(input_str)
-    formatted_dates = [format_datetime(date, format=formats[get_id(message)], locale=locales[get_id(message)]) for date
-                       in dates]
+    formatted_dates = [
+        format_datetime(
+            date, format=formats[get_id(message)], locale=locales[get_id(message)]
+        )
+        for date in dates
+    ]
     return formatted_dates_to_out(formatted_dates)
 
 
 @client.event
 async def on_message(message):
     if message.content.find("/datepoll") != -1:
-
         if message.author == client.user:
             return
 
         if message.content == "/datepoll help":
             await message.add_reaction(emojize(":partying_face:"))
-            msg = '''You can use me to set up quick date polls.
+            msg = """You can use me to set up quick date polls.
 
     I listen to messages containing "/datepoll" followed by a list of ISO 8601 dates separated by whitespace or commas. The list must be at least 1 and at most 37 dates long. The ISO 8601 format includes the YYYY-MM-DD format and many simplifications of it like MM-DD.
 
     You can set the format of the returned dates by using "/datepoll format FORMAT" where FORMAT is a format using the Unicode Date Format Patterns, which can be found here:
     https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns
 
-        You can set the locale of the returned dates by using "/datepoll locale LOCALE where LOCALE is a locale such as en_US or de_DE using the ISO language and country codes.'''
+        You can set the locale of the returned dates by using "/datepoll locale LOCALE where LOCALE is a locale such as en_US or de_DE using the ISO language and country codes."""
             await message.channel.send(msg)
             return
 
         format_command = "/datepoll format"
         if message.content.startswith(format_command):
-            format_str = message.content[len(format_command) + 1:]
+            format_str = message.content[len(format_command) + 1 :]
             formats[get_id(message)] = format_str
             save_config()
             return
 
         locale_command = "/datepoll locale"
         if message.content.startswith(locale_command):
-            locale_str = message.content[len(locale_command) + 1:]
+            locale_str = message.content[len(locale_command) + 1 :]
             locales[get_id(message)] = locale_str
             save_config()
             return
 
-        if not get_id(message) in formats.keys():
+        if get_id(message) not in formats.keys():
             format_str = "cccc, yyyy-MM-dd"
             formats[get_id(message)] = format_str
 
-        if not get_id(message) in locales.keys():
+        if get_id(message) not in locales.keys():
             locale_str = str(message.guild.preferred_locale)
             locales[get_id(message)] = locale_str.replace("-", "_")
 
@@ -151,10 +176,21 @@ async def on_message(message):
 
 @client.event
 async def on_ready():
-    print('Logged in as')
+    print("Logged in as")
     print(client.user.name)
     print(client.user.id)
-    print('------')
+    print("------")
 
 
-client.run(TOKEN)
+def main():
+    TOKEN = os.environ.get("QDPB_TOKEN")
+    if TOKEN is None:
+        print(
+            "ERROR: Token not found. Export your bot's access token in the QDPB_TOKEN environment variable."
+        )
+        quit()
+    client.run(TOKEN)
+
+
+if __name__ == "__main__":
+    main()

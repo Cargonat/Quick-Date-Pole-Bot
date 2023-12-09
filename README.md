@@ -7,16 +7,30 @@ account: [Creating a Bot Account}(https://discordpy.readthedocs.io/en/stable/dis
 
 Export the discord token in the `QDPB_TOKEN` environment variable.
 
-## How to run the bot locally
+## Local development
 
-1. Install Python (at least 3.9)
-2. Install the requirements in `requirements.txt` via `pip install -r requirements.txt`. 
-   Note: You might want to do this in a [virtual environment](https://docs.python.org/3/tutorial/venv.html).
-3. Run `bot.py` with Python, e.g. via `python bot.py` or `python3 bot.py`.
+### Setup
 
-## How to run the bot via Docker
+1. Install Python >= 3.11
+2. Install [poetry](https://python-poetry.org/) for dependency management
+3. Run `poetry install --with dev` to install all dependencies
+4. Run `poetry run pre-commit install` to register git pre-commit hooks
 
-1. Install Docker
-2. Run `docker image build -t qdpb .` (including the dot `.`)
-3. Run the docker image via `docker run qdpb`. You might want to add
-   `--restart always` for the container to automatically restart.
+### Execution
+
+1. Export the `QDPB_TOKEN` environment variable
+2. Run `poetry run bot`
+
+## Docker
+
+You can build the Dockerfile with
+
+```bash
+docker build -t qdpb .
+```
+
+You can then execute it with
+
+```bash
+docker run --rm -it -e QDPB_TOKEN=<token-here> qdpb
+```

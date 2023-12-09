@@ -1,14 +1,20 @@
-# Specify base image
-FROM python:3.10
+FROM python:3.11 as base
 
-WORKDIR /usr/app/qdpb
+WORKDIR /app
 
-# add the required files
-ADD bot.py .
-ADD requirements.txt .
+RUN PIP_CACHE_DIR=/app/.pip-cache pip install poetry
+RUN poetry config virtualenvs.in-project true
 
-# install dependencies
-RUN pip install -r requirements.txt
+COPY pyproject.toml poetry.lock README.md ./
+COPY qdpb/bot.py qdpb/bot.py
 
-# run the bot
-CMD [ "python3", "./bot.py" ]
+RUN poetry install --without dev
+
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY --from=base /app /app
+RUN PIP_CACHE_DIR=/app/.pip-cache pip install poetry
+RUN rm -rf PIP_CACHE_DIR
+
+ENTRYPOINT [ "poetry", "run", "bot" ]
